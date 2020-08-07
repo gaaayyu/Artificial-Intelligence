@@ -1,0 +1,157 @@
+// ~->[DNET-1]->~
+
+// File created by an unlicensed user using Netica 6.07 on Jun 07, 2020 at 19:59:57 UTC.
+
+bnet SmokeAlarm_new {
+AutoCompile = TRUE;
+autoupdate = TRUE;
+whenchanged = 1591559951;
+
+visual V1 {
+	defdispform = BELIEFBARS;
+	nodelabeling = TITLE;
+	NodeMaxNumEntries = 50;
+	nodefont = font {shape= "Arial"; size= 9;};
+	linkfont = font {shape= "Arial"; size= 9;};
+	ShowLinkStrengths = 1;
+	windowposn = (25, 25, 1127, 686);
+	resolution = 72;
+	magnification = 0.840896;
+	drawingbounds = (1284, 720);
+	showpagebreaks = FALSE;
+	usegrid = TRUE;
+	gridspace = (6, 6);
+	NodeSet Node {BuiltIn = 1; Color = 0x00e1e1e1;};
+	NodeSet Nature {BuiltIn = 1; Color = 0x00f8eed2;};
+	NodeSet Deterministic {BuiltIn = 1; Color = 0x00d3caa6;};
+	NodeSet Finding {BuiltIn = 1; Color = 0x00c8c8c8;};
+	NodeSet Constant {BuiltIn = 1; Color = 0x00ffffff;};
+	NodeSet ConstantValue {BuiltIn = 1; Color = 0x00ffffb4;};
+	NodeSet Utility {BuiltIn = 1; Color = 0x00ffbdbd;};
+	NodeSet Decision {BuiltIn = 1; Color = 0x00dee8ff;};
+	NodeSet Documentation {BuiltIn = 1; Color = 0x00f0fafa;};
+	NodeSet Title {BuiltIn = 1; Color = 0x00ffffff;};
+	PrinterSetting A {
+		margins = (1270, 1270, 1270, 1270);
+		};
+	};
+
+node Tampering {
+	discrete = TRUE;
+	states = (T, F);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = ();
+	probs = 
+		// T            F            
+		  (0.02,        0.98);
+	whenchanged = 1591559862;
+	belief = (0.02, 0.98);
+	visual V1 {
+		center = (192, 84);
+		height = 2;
+		};
+	};
+
+node Fire {
+	discrete = TRUE;
+	states = (T, F);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = ();
+	probs = 
+		// T            F            
+		  (0.01,        0.99);
+	whenchanged = 1591559862;
+	belief = (0.01, 0.99);
+	visual V1 {
+		center = (384, 84);
+		height = 1;
+		};
+	};
+
+node Alarm {
+	discrete = TRUE;
+	states = (T, F);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = (Tampering, Fire);
+	probs = 
+		// T            F             // Tampering Fire 
+		  (0.5,         0.5,          // T         T    
+		   0.85,        0.15,         // T         F    
+		   0.99,        0.01,         // F         T    
+		   0,           1);           // F         F    ;
+	numcases = 1;
+	whenchanged = 1591559862;
+	belief = (0.026632, 0.973368);
+	visual V1 {
+		center = (288, 210);
+		height = 3;
+		link 1 {
+			path = ((211, 110), (268, 184));
+			};
+		link 2 {
+			path = ((365, 110), (308, 184));
+			};
+		};
+	};
+
+node Evacuation {
+	discrete = TRUE;
+	states = (Yes, No);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = (Alarm);
+	probs = 
+		// Yes          No            // Alarm 
+		  (0.9,         0.1,          // T     
+		   0,           1);           // F     ;
+	whenchanged = 1591559920;
+	belief = (0.0239688, 0.9760312);
+	visual V1 {
+		center = (210, 318);
+		height = 5;
+		link 1 {
+			path = ((270, 236), (229, 292));
+			};
+		};
+	};
+
+node Smoke {
+	discrete = TRUE;
+	states = (Yes, No);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = (Fire);
+	probs = 
+		// Yes          No            // Fire 
+		  (0.95,        0.05,         // T    
+		   0.05,        0.95);        // F    ;
+	whenchanged = 1591559951;
+	belief = (0.059, 0.941);
+	visual V1 {
+		center = (486, 210);
+		height = 4;
+		};
+	};
+
+node Report {
+	discrete = TRUE;
+	states = (Yes, No);
+	kind = NATURE;
+	chance = CHANCE;
+	parents = (Evacuation);
+	probs = 
+		// Yes          No            // Evacuation 
+		  (0.7,         0.3,          // Yes        
+		   0.1,         0.9);         // No         ;
+	whenchanged = 1591559942;
+	belief = (0.1143813, 0.8856187);
+	visual V1 {
+		center = (246, 426);
+		height = 6;
+		};
+	};
+ElimOrder = (Smoke, Report, Evacuation, Tampering, Fire, Alarm);
+};
